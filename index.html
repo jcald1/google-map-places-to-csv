@@ -1,0 +1,89 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>Google Maps Places to CSV</title>
+    <meta name="description" content="The HTML5 Herald">
+    <meta name="author" content="SitePoint">
+
+    <link rel="stylesheet" href="css/styles.css?v=1.0">
+
+    <style>
+        .message {color:red; font-size: 150%;}
+
+        input, textarea, select, button {
+            width : 200px;
+            margin: 0;
+
+            -webkit-box-sizing: border-box; /* For legacy WebKit based browsers */
+            -moz-box-sizing: border-box; /* For legacy (Firefox <29) Gecko based browsers */
+            box-sizing: border-box;
+        }
+    </style>
+    <script src="https://unpkg.com/google-libphonenumber@3.2.3/dist/libphonenumber.js"></script>
+    <script type="module">
+        import config from "./js/config.js";
+        console.log('apiKey', config.google.apiKey)
+
+        import { placeSearch, handleError  } from "./js/api.js";
+
+
+        function handleSubmit() {
+            console.log('handleSubmit')
+        }
+
+        window.onload = function(){
+            var handleSubmit = function(caller) {
+                const address = caller.form.elements.address.value;
+                const phone = caller.form.elements.phone.value;
+                console.log('handleSubmit', 'address', address, 'phone', phone);
+
+                if (address && phone) {
+                    return handleError(new Error('You can only enter in an address or a phone number'))
+                }
+                placeSearch(config.google.apiKey, address, phone)
+            };
+
+            var button = document.getElementById('button');
+            button.addEventListener('click', function(){
+                handleSubmit(this);
+            });
+        }
+
+        var scriptElement = document.createElement("script");
+        scriptElement.src = "https://maps.googleapis.com/maps/api/js?key="+config.google.apiKey+"&libraries=places&callback=initMap";
+        scriptElement.defer = true;
+        document.head.appendChild(scriptElement);
+
+    </script>
+</head>
+
+<body>
+    <div id="map"></div>
+    <br/>
+    <div class = "message" id="message" ></div>
+    <div id="form">
+        <form>
+            <div>
+                <label for="address">Address:</label>
+                <br/>
+                <input type="text" id="address" name="address">
+            </div>
+            <br/>
+            or
+            <br/>
+            <br/>
+            <div>
+                <label for="phone">Phone:</label>
+                <br/>
+                <input type="text" id="phone" name="phone">
+            </div>
+            <br/>
+            <!--<input id="submit" type="submit" value="Submit">-->
+            <button id="button" type="button">Submit</button>
+        </form>
+    </div>
+</body>
+</html>
