@@ -6,8 +6,8 @@ This web tool lets you search for business information (name, address, phone num
 
 ## Setup
 
-1.  Go to `https://developers.google.com/maps/gmp-get-started` and to set up your Google account and Google Maps API Key.  In the 'Getting Started' section, select the 'Maps' and 'Places' checkbox.  Google requires you to set up a billing account.
-1. You can manage your account by going to `https://console.cloud.google.com/google/maps-apis`.
+1.  Go to [https://developers.google.com/maps/gmp-get-started](https://developers.google.com/maps/gmp-get-started) and to set up your Google account and Google Maps API Key.  In the 'Getting Started' section, select the 'Maps' and 'Places' checkbox.  Google requires you to set up a billing account.
+1. You can manage your account by going to [https://console.cloud.google.com/google/maps-apis](https://console.cloud.google.com/google/maps-apis).
 1. Copy the generated API Key from the step above.
 1. Download this Tool
     1. For Non-Developers:

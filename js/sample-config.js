@@ -1,6 +1,6 @@
 const config = {
     google: {
-        apiKey: 'AIzaSyDiSm0ZctB0S-g3b_Rnpjp75322AqdLnJY',
+        apiKey: '*** ADD YOUR GOOGLE MAPS API KEY HERE ***',
         maps: {
             zoom: 15,
             coordinates : {
