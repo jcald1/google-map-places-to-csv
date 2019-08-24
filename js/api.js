@@ -87,6 +87,13 @@ const placeSearch = async (address, phone, csvs) => {
     })
 }
 
+function timeout() {
+    return new Promise(resolve => setTimeout(resolve, config.google.delayMilliseconds));
+}
+const sleep = async () => {
+    await timeout();
+}
+
 const placesSearch = async (apiKey, address, phone, fileContents) => {
     try {
         console.log('placesSearch', address, phone, 'file length', fileContents && fileContents.length)
@@ -121,11 +128,13 @@ const placesSearch = async (apiKey, address, phone, fileContents) => {
         for (let i = 0; i < addresses.length; i++) {
             console.log('Processing address', addresses[i])
             const result = await placeSearch(addresses[i], null, csvs)
+            await sleep();
             results.push(result)
         }
         for (let i = 0; i < phones.length; i++) {
             console.log('Processing phone', phones[i])
             const result = await placeSearch(null, phones[i], csvs)
+            await sleep();
             results.push(result)
         }
 

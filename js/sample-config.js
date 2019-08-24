@@ -7,7 +7,8 @@ const config = {
                 lat: '***** ADD THE LATITUDE OF THE MAP YOU WANT TO SEARCH ******',
                 lon: '***** ADD THE LONGITUDE OF THE MAP YOU WANT TO SEARCH *****'
             },
-        }
+        },
+        delayMilliseconds: 500
     },
 
     corsProxyUrl: 'https://cors-anywhere.herokuapp.com/',
