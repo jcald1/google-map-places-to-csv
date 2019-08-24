@@ -2,8 +2,6 @@
 
 This web tool lets you search for business information (name, address, phone number, website, latitude, longitude) by address or phone number using the Google Maps Places API, and returns a list of businesses and information at that address or phone number.
 
-**See the 'Running the Tool' section below for information about browsers supported**
-
 ## Setup
 
 1.  Go to [https://developers.google.com/maps/gmp-get-started](https://developers.google.com/maps/gmp-get-started) and to set up your Google account and Google Maps API Key.  In the 'Getting Started' section, select the 'Maps' and 'Places' checkbox.  Google requires you to set up a billing account.
@@ -23,7 +21,6 @@ This web tool lets you search for business information (name, address, phone num
  1.  If searching by phone number and searching for phone numbers outside of the US, change the country code property in `config.js` with the [two letter country code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2).  To learn  more about the phone formatter used by this tool, visit the [google libphonenumber page](https://github.com/google/libphonenumber)
  
  ## Running the Tool
- 1.  If you're using Firefox, you should be able to just run it in thee browser.  For other browsers, you may need to [set up a local web server](https://gist.github.com/jgravois/5e73b56fa7756fd00b89).  If this link isn't working, just search for 'test local web server'.  
  1.  Navigate to the extracted zip folder and copy the path of the `index.html` file (e.g., `/home/user/Downloads/google-map-places-to-csv/index.html`).  Paste this path into your browser's URL text box.
  1.  Search by either entering in a phone number, an address, or by selecting a CSV file.  The phone numbers don't have to be in any particular format as this tool uses a software library to convert it to a standard format. For addresses, enter in the full address if you have it.  If not, then a partial address may be OK (just like when you enter a partial address in Google Maps)
      1.  For CSV Files, note the following
@@ -37,4 +34,6 @@ This web tool lets you search for business information (name, address, phone num
          1.  If you use a tool like Excel to export the CSV, make sure you pay attention to the options in the export so the rules above are followed. There should be an option to include the header (address,phone) in the CSV output 
  1.  This tool does a "Search Places" and "Search Details" call on every address or phone number serially. Since the calls aren't going out in parallel, this means that it can take a long time for a CSV file to be processed.
  1.  The maximum number of results for any given address or phone number is currently 20.  Google lets you query additional results (up to 60), but this tool doesn't do that.
- 1.  If the tool doesn't seem to work, [look at your console for errors](https://zapier.com/help/troubleshoot/behavior/view-and-save-your-browser-console-logs).
+ 1.  After entering in an address, phone number, or CSV, if the tool doesn't seem to do anything, [check your console for errors](https://zapier.com/help/troubleshoot/behavior/view-and-save-your-browser-console-logs). If this link doesn't work, search for 'check console' and the name of your browser (firefox, safari, chrome, etc.).
+ 1.  If you see an error related to CORS, change the settings on browser to get around the CORS error.  [This site](http://testingfreak.com/how-to-fix-cross-origin-request-security-cors-error-in-firefox-chrome-and-ie/) has instructions on how to do that or just search for "fix CORS" and the name of your browser (firefox, safari, chrome, etc.).
+ 1.  If you still can't get it to work, try Firefox as it may work better than the other browsers.  If Firefox doesn't work and you tried fixing the CORS error and you're still getting CORS errors or some other error, you may need to [set up a local web server](https://gist.github.com/jgravois/5e73b56fa7756fd00b89).  If this link isn't working, just search for 'test local web server'.  Those instructions should tell you how to set up the web server on your system, copy in the contents of the extracted zip directory to the web server's directory of web files, start the web server, and open the tool in the browser (should be http://localhost/<some_path>).
