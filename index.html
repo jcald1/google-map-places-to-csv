@@ -13,7 +13,7 @@
     <style>
         .message {color:red; font-size: 150%;}
 
-        input, textarea, select, button {
+        input, textarea, select, submit {
             width : 200px;
             margin: 0;
 
@@ -23,33 +23,62 @@
         }
     </style>
     <script src="https://unpkg.com/google-libphonenumber@3.2.3/dist/libphonenumber.js"></script>
+
     <script type="module">
         import config from "./js/config.js";
         console.log('apiKey', config.google.apiKey)
 
-        import { placeSearch, handleError  } from "./js/api.js";
+        import { placesSearch, handleError  } from "./js/api.js";
 
-
-        function handleSubmit() {
-            console.log('handleSubmit')
-        }
-
-        window.onload = function(){
-            var handleSubmit = function(caller) {
+        const handleSubmit = function (caller) {
+            console.log('handleSubmit', window, caller)
+            try {
                 const address = caller.form.elements.address.value;
                 const phone = caller.form.elements.phone.value;
-                console.log('handleSubmit', 'address', address, 'phone', phone);
+                const fileElement = document.getElementById('file') //caller.form.elements.file.baseURI;
+                const file = fileElement && fileElement.files && fileElement.files[0]
 
-                if (address && phone) {
-                    return handleError(new Error('You can only enter in an address or a phone number'))
+                console.log('handleSubmit', 'address', address, 'phone', phone, 'file', file);
+
+                if (!address && !phone && !file) {
+                    throw new Error('Address, phone number, or file must be provided')
                 }
-                placeSearch(config.google.apiKey, address, phone)
-            };
 
-            var button = document.getElementById('button');
-            button.addEventListener('click', function(){
-                handleSubmit(this);
-            });
+                if ((address && phone) || (address && file) || (phone && file) ) {
+                    return handleError(new Error('You can only enter in an address or a phone number or a file'))
+                }
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        console.log('!!!!! onload',e)
+                        var fileContents = e.target.result;
+                        placesSearch(config.google.apiKey, address, phone, fileContents)
+                    };
+                    reader.readAsText(file);
+
+                }
+                else {
+                    placesSearch(config.google.apiKey, address, phone, null)
+                }
+            }
+            catch (err) {
+                handleError(err)
+            }
+        }
+
+        window.onload = () => {
+            try {
+                var button = document.getElementById('submit');
+                button.addEventListener('click',  function () {
+                    handleSubmit(this);
+                });
+
+
+            }
+            catch (err) {
+                handleError(err)
+            }
         }
 
         var scriptElement = document.createElement("script");
@@ -63,6 +92,8 @@
 <body>
     <div id="map"></div>
     <br/>
+    <h3>Google Maps Places: Get Business Name, Address, Phone Numbers, and Website by Searching by Addresses or Phone Number. Results are Exported to CSV
+    </h3>
     <div class = "message" id="message" ></div>
     <div id="form">
         <form>
@@ -81,8 +112,19 @@
                 <input type="text" id="phone" name="phone">
             </div>
             <br/>
+            or
+            <br/>
+            <br/>
+            <div>
+                <label for="file">CSV File (Header in first row: 'address' first column, 'phone' in the second).  Addresses and phone numbers don't need to match in the same row.  Only the address or phone number is needed for each place searched:</label>
+                <br/>
+                <input type="file" id="file" name="file">
+            </div>
+
+            <br/>
+            <br/>
             <!--<input id="submit" type="submit" value="Submit">-->
-            <button id="button" type="button">Submit</button>
+            <button id="submit" type="button">Submit</button>
         </form>
     </div>
 </body>

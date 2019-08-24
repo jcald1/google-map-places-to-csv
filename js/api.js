@@ -1,4 +1,5 @@
 import config from "./config.js";
+import {CSVToArray} from "./csv.js"
 
 const PNF = window['libphonenumber'].PhoneNumberFormat
 const phoneUtil = window['libphonenumber'].PhoneNumberUtil.getInstance();
@@ -6,64 +7,150 @@ const phoneUtil = window['libphonenumber'].PhoneNumberUtil.getInstance();
 var map;
 var infowindow;
 
-const placeSearch = (apiKey, address, phone) => {
-    try {
-        console.log('placeSearch', address, phone)
 
-        clearMessage()
+const getFileData = (fileContents) => {
+    const csvFileArray = CSVToArray(fileContents, ',');
+    console.log('csvFileArray', csvFileArray);
 
-        var city = new google.maps.LatLng(config.google.maps.coordinates.lat, config.google.maps.coordinates.lon);
+    const addresses = [];
+    const phones = [];
+    if (csvFileArray[0] && csvFileArray[0][0] === 'address' && csvFileArray[0][1] === 'phone') {
+        const noHeaderArr = csvFileArray.slice(1)
+        console.log('noHeaderArr', noHeaderArr)
+        noHeaderArr.map(row => {
+            console.log('row', row)
+            if (row[0]) {
+                addresses.push(row[0])
+            }
+            if (row[1]) {
+                phones.push(row[1])
+            }
+        })
+        return {addresses, phones}
+    } else {
+        throw new Error('The CSV file does not appear to be correct.  Error processing the CSV file.  Make sure it starts with "address,phone" and that addresses are in double quotes')
+    }
+}
 
-        infowindow = new google.maps.InfoWindow();
+const placeSearch = async (address, phone, csvs) => {
+    console.log('placeSearch', address, phone, csvs)
 
-        map = new google.maps.Map(
-            document.getElementById('map'), {center: city, zoom: config.google.maps.zoom});
+    var city = new google.maps.LatLng(config.google.maps.coordinates.lat, config.google.maps.coordinates.lon);
 
-        const classesMapping = {
-            'findPlaceFromQuery': google.maps.places.PlacesService,
-            'findPlaceFromPhoneNumber': google.maps.places.PlacesService
+    infowindow = new google.maps.InfoWindow();
+
+    map = new google.maps.Map(
+        document.getElementById('map'), {center: city, zoom: config.google.maps.zoom});
+
+    const classesMapping = {
+        'findPlaceFromQuery': google.maps.places.PlacesService,
+        'findPlaceFromPhoneNumber': google.maps.places.PlacesService
+    };
+
+    let apiMethod;
+    let request;
+    let serviceName;
+    if (address) {
+        request = {
+            query: address,
+            fields: ['formatted_address', 'name', 'opening_hours', 'geometry', 'place_id', 'plus_code', 'types'],
         };
+        apiMethod = 'findPlaceFromQuery';
+    } else {
+        const number = phoneUtil.parseAndKeepRawInput(phone, config.country);
+        const phoneNumber = phoneUtil.format(number, PNF.E164);
+        request = {
+            phoneNumber,
+            fields: ['formatted_address', 'name', 'opening_hours', 'geometry', 'place_id', 'plus_code', 'types'],
+        };
+        apiMethod = 'findPlaceFromPhoneNumber';
+    }
+    console.log('Class', classesMapping[apiMethod], apiMethod, classesMapping)
+    const service = new classesMapping[apiMethod](map);
 
-        let apiMethod;
-        let request;
-        let serviceName;
-        if (address) {
-            request = {
-                query: address,
-                fields: ['formatted_address', 'name', 'opening_hours', 'geometry', 'place_id', 'plus_code', 'types'],
-            };
-            apiMethod = 'findPlaceFromQuery';
-        } else {
-            const number = phoneUtil.parseAndKeepRawInput(phone, config.country);
-            const phoneNumber = phoneUtil.format(number, PNF.E164);
-            request = {
-                phoneNumber,
-                fields: ['formatted_address', 'name', 'opening_hours', 'geometry', 'place_id', 'plus_code', 'types'],
-            };
-            apiMethod = 'findPlaceFromPhoneNumber';
-        }
-        console.log('Class',classesMapping[apiMethod], apiMethod, classesMapping)
-        const service = new classesMapping[apiMethod](map);
+    console.log(`Calling ${apiMethod}`, request)
 
-        console.log(`Calling ${apiMethod}`, request)
-        service[apiMethod](request, function (results, status) {
+    return new Promise( async (resolve, reject) => {
+        service[apiMethod](request, async (results, status) => {
             if (status === google.maps.places.PlacesServiceStatus.OK) {
                 for (var i = 0; i < results.length; i++) {
                     console.log('result', results[i]);
-                    placeDetails(results[i])
+                    const result = await placeDetails(results[i], csvs)
                 }
+                resolve();
             } else {
                 const err = new Error(`Error Calling Search. Status: ${status}`)
                 handleError(err)
+                reject(err);
             }
         });
+    })
+}
+
+const placesSearch = async (apiKey, address, phone, fileContents) => {
+    try {
+        console.log('placesSearch', address, phone, 'file length', fileContents && fileContents.length)
+
+        clearMessage()
+
+        let addresses = []
+        let phones = []
+        const files = []
+
+        if (address) {
+            addresses.push((address))
+        }
+        if (phone) {
+            phones.push((phone))
+        }
+        if (fileContents) {
+            const fileData = getFileData(fileContents)
+            if (fileData.addresses) {
+                addresses = addresses.concat(fileData.addresses)
+            }
+            if (fileData.phones) {
+                phones = phones.concat(fileData.phones)
+            }
+        }
+        console.log('Processing data', 'addresses', addresses, 'phones', phones)
+
+        const csvs = []
+        const results = []
+
+        updateMessage('Calling Google Maps Places')
+        for (let i=0; i < addresses.length; i++) {
+            console.log('Processing address', addresses[i])
+            const result = await placeSearch(addresses[i], null, csvs)
+            results.push(result)
+        }
+        for (let i=0; i < phones.length; i++) {
+            console.log('Processing phone', phones[i])
+            const result = await placeSearch(null, phones[i], csvs)
+            results.push(result)
+        }
+
+        console.log('$$$$$ csvs', csvs)
+        const rowsWithCommas = csvs.map(row => row.join(','))
+        console.log('rowsWithCommas', rowsWithCommas, csvs, csvs.length)
+
+        const csvStrNoHeaders = rowsWithCommas.join('\r\n');
+        console.log('csvStrNoHeaders', csvStrNoHeaders)
+
+        console.log('rowsWithCommas', rowsWithCommas, 'csvStrNoHeaders', csvStrNoHeaders)
+        const csv = generate_csv_headers().join(',') + '\r\n' + csvStrNoHeaders
+        console.log('csv', csv)
+
+        downloadFile(csv, 'data.csv', "text/csv");
+        updateMessage('Download Complete.  The CSV should have downloaded or opened up in an application like Excel')
+
     } catch (err) {
         handleError(err)
+        console.error(err)
     }
 
 }
 
-const placeDetails = (result) => {
+const placeDetails = async (result, csvs) => {
     console.log('placeDetails');
 
     /*
@@ -74,37 +161,45 @@ const placeDetails = (result) => {
     service.getDetails(request, placeDetailsCb);
     */
 
-    apiClient(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${result.place_id}&key=${config.google.apiKey}`)
+    await apiClient(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${result.place_id}&key=${config.google.apiKey}`, csvs)
 }
 
 /*/
   params  url : site that doesn’t send Access-Control-*
  */
-const apiClient = (url) => {
+const apiClient = (url, csvs) => {
     const proxyurl = config.corsProxyUrl;
 
-    fetch(proxyurl + url)
+    return fetch(proxyurl + url)
         .then(
-            function (response) {
+            (response) => {
                 if (response.status !== 200) {
-                    console.log(`Looks like there was a problem calling ${url}. Status Code: 
-                        ${response.status}`);
-                    return;
+                    const err = new Error(`Looks like there was a problem calling ${url}. Status Code: 
+                        ${response.status}`)
+                    console.error(err);
+                    throw err;
                 }
                 console.log('url', url, 'response', response)
                 // Examine the text in the response
-                response.json()
-                    .then(function (data) {
+                return response.json()
+                    .then((data) => {
                         console.log(data);
                         console.log(data.result)
-                        generate_csv(data.result)
+                        const csv_row = generate_csv(data.result)
+                        csvs.push(csv_row)
+                        return csv_row
                     })
-                    .catch(err => handleError((err)))
+                    .catch(err => {
+                        console.error(err);
+                        //handleError((err))
+                        throw err;
+                    })
             }
         )
-        .catch(function (err) {
-            console.log(`Fetch Error calling ${url}`, err);
-            handleError(err)
+        .catch((err) => {
+            console.error(`Fetch Error calling ${url}`, err);
+            //handleError(err)
+            throw err;
         });
 }
 
@@ -130,13 +225,9 @@ const generate_csv = (result) => {
             return `"${val.replace('"', '""')}"`
         }
         return val;
-
     });
-
-    const csv = generate_csv_headers().join(',') + '\r\n' + arr2.join(',') + '\r\n'
-    console.log('csv', csv)
-
-    downloadFile(csv, 'data.csv', "text/csv");
+    console.log('generate_csv returning', arr2)
+    return arr2
 }
 
 const placeDetailsCb = (place, status) => {
@@ -180,7 +271,11 @@ const handleError = (err) => {
     document.getElementById('message').innerHTML = err.message;
 }
 
+const updateMessage = (message) => {
+    clearMessage()
+    document.getElementById('message').innerHTML = message;
+}
 export {
-    placeSearch,
+    placesSearch,
     handleError
 }
