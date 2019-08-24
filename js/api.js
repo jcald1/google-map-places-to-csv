@@ -126,17 +126,26 @@ const placesSearch = async (apiKey, address, phone, fileContents) => {
         const results = []
 
         updateMessage('Calling Google Maps Places')
+        let count = 0;
         for (let i = 0; i < addresses.length; i++) {
             console.log('Processing address', addresses[i])
             const result = await placeSearch(addresses[i], null, csvs)
             await sleep();
             results.push(result)
+            count += 1;
+            const msg = `Calling Google Maps Places.  Called: ${count}`;
+            console.log(msg);
+            updateMessage(msg);
         }
         for (let i = 0; i < phones.length; i++) {
             console.log('Processing phone', phones[i])
             const result = await placeSearch(null, phones[i], csvs)
             await sleep();
             results.push(result)
+            count += 1;
+            const msg = `Calling Google Maps Places.  Called: ${count}`;
+            console.log(msg);
+            updateMessage(msg);
         }
 
         console.log('$$$$$ csvs', csvs)
@@ -283,7 +292,7 @@ const handleError = (err) => {
 }
 
 const updateMessage = (message) => {
-    clearMessage()
+    //clearMessage()
     document.getElementById('message').innerHTML = message;
 }
 export {
