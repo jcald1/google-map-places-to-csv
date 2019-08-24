@@ -76,6 +76,7 @@ const placeSearch = async (address, phone, csvs) => {
                 for (var i = 0; i < results.length; i++) {
                     console.log('result', results[i]);
                     const result = await placeDetails(results[i], csvs)
+                    await sleep();
                 }
                 resolve();
             } else {
