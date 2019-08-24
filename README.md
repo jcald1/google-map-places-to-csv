@@ -27,6 +27,7 @@ This web tool lets you search for business information (name, address, phone num
  1.  Navigate to the extracted zip folder and copy the path of the `index.html` file (e.g., `/home/user/Downloads/google-map-places-to-csv/index.html`).  Paste this path into your browser's URL text box.
  1.  Search by either entering in a phone number, an address, or by selecting a CSV file.  The phone numbers don't have to be in any particular format as this tool uses a software library to convert it to a standard format. For addresses, enter in the full address if you have it.  If not, then a partial address may be OK (just like when you enter a partial address in Google Maps)
      1.  For CSV Files, note the following
+         1.  Look at the `sample-config.js` file for an example.
          1.  The first row has to start with "address,phone"
          1.  You only need the address or the phone number of a place you're looking for.  The results will return both the address and phone number if matches are found (plus all of the other information).
          1.  You can treat the address and phone numbers as two different sets of data.  If a row has both an address and a phone number, they do not need to belong to each other.  Just list out all of your addresses in the first column and all of your phone numbers in the second column.
@@ -34,4 +35,6 @@ This web tool lets you search for business information (name, address, phone num
          1.  If you are just entering in a phone number and not an address, use this format: `,(999) 999-9999`.  Note the starting comma which reflects an empty string for the first column (address)
          1.  The addresses should be surrounded by double quotes, e.g. `"123 Main St., San Francisco, CA"`.  This prevents the commas in the addresses from messing up the CSV columns.  If the address itself needs a double quote, then replace it with two double quotes next to each other, e.g. `"Attn ""Mr. Rogers"", 123 Main St., San Francisco, CA"`
          1.  If you use a tool like Excel to export the CSV, make sure you pay attention to the options in the export so the rules above are followed. There should be an option to include the header (address,phone) in the CSV output 
+ 1.  This tool does a "Search Places" and "Search Details" call on every address or phone number serially. Since the calls aren't going out in parallel, this means that it can take a long time for a CSV file to be processed.
+ 1.  The maximum number of results for any given address or phone number is currently 20.  Google lets you query additional results (up to 60), but this tool doesn't do that.
  1.  If the tool doesn't seem to work, [look at your console for errors](https://zapier.com/help/troubleshoot/behavior/view-and-save-your-browser-console-logs).

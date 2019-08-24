@@ -70,7 +70,7 @@ const placeSearch = async (address, phone, csvs) => {
 
     console.log(`Calling ${apiMethod}`, request)
 
-    return new Promise( async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         service[apiMethod](request, async (results, status) => {
             if (status === google.maps.places.PlacesServiceStatus.OK) {
                 for (var i = 0; i < results.length; i++) {
@@ -118,12 +118,12 @@ const placesSearch = async (apiKey, address, phone, fileContents) => {
         const results = []
 
         updateMessage('Calling Google Maps Places')
-        for (let i=0; i < addresses.length; i++) {
+        for (let i = 0; i < addresses.length; i++) {
             console.log('Processing address', addresses[i])
             const result = await placeSearch(addresses[i], null, csvs)
             results.push(result)
         }
-        for (let i=0; i < phones.length; i++) {
+        for (let i = 0; i < phones.length; i++) {
             console.log('Processing phone', phones[i])
             const result = await placeSearch(null, phones[i], csvs)
             results.push(result)
@@ -161,7 +161,8 @@ const placeDetails = async (result, csvs) => {
     service.getDetails(request, placeDetailsCb);
     */
 
-    await apiClient(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${result.place_id}&key=${config.google.apiKey}`, csvs)
+    const fields = 'id,formatted_address,international_phone_number,formatted_phone_number,geometry,name,place_id,url,website,types';
+    await apiClient(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${result.place_id}&key=${config.google.apiKey}&fields=${fields}`, csvs)
 }
 
 /*/
