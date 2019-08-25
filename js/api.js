@@ -34,9 +34,6 @@ const getFileData = (fileContents) => {
 
 const placeSearch = async (address, phone, csvs, count) => {
     console.log('placeSearch', address, phone, csvs)
-    if (count ==1) {
-        throw new Error('test error')
-    }
 
     var city = new google.maps.LatLng(config.google.maps.coordinates.lat, config.google.maps.coordinates.lon);
 
