@@ -32,8 +32,11 @@ const getFileData = (fileContents) => {
     }
 }
 
-const placeSearch = async (address, phone, csvs) => {
+const placeSearch = async (address, phone, csvs, count) => {
     console.log('placeSearch', address, phone, csvs)
+    if (count ==1) {
+        throw new Error('test error')
+    }
 
     var city = new google.maps.LatLng(config.google.maps.coordinates.lat, config.google.maps.coordinates.lon);
 
@@ -75,7 +78,7 @@ const placeSearch = async (address, phone, csvs) => {
             if (status === google.maps.places.PlacesServiceStatus.OK) {
                 for (var i = 0; i < results.length; i++) {
                     console.log('result', results[i]);
-                    const result = await placeDetails(results[i], csvs)
+                    const result = await placeDetails(results[i], csvs, count)
                     await sleep();
                 }
                 resolve();
@@ -95,7 +98,32 @@ const sleep = async () => {
     await timeout();
 }
 
+const generateAndSaveCsv = (err, csvs, count ) => {
+    if (!csvs || csvs.length == 0) {
+        return updateMessage('No CSVs data generated')
+    }
+
+    console.log('$$$$$ csvs', csvs)
+    const rowsWithCommas = csvs.map(row => row.join(','))
+    console.log('rowsWithCommas', rowsWithCommas, csvs, csvs.length)
+
+    const csvStrNoHeaders = rowsWithCommas.join('\r\n');
+    console.log('csvStrNoHeaders', csvStrNoHeaders)
+
+    console.log('rowsWithCommas', rowsWithCommas, 'csvStrNoHeaders', csvStrNoHeaders)
+    const csv = generate_csv_headers().join(',') + '\r\n' + csvStrNoHeaders
+    console.log('csv', csv)
+
+    downloadFile(csv, 'data.csv', "text/csv");
+    const msg = err ? err.message + ` Partial Results Count: ${count}` : `Download Complete.  Total Count: ${count} The CSV should have downloaded or opened up in an an app like Excel`
+    updateMessage(msg)
+}
+
 const placesSearch = async (apiKey, address, phone, fileContents) => {
+    let count = 0;
+    const csvs = []
+    const results = []
+
     try {
         console.log('placesSearch', address, phone, 'file length', fileContents && fileContents.length)
 
@@ -122,14 +150,11 @@ const placesSearch = async (apiKey, address, phone, fileContents) => {
         }
         console.log('Processing data', 'addresses', addresses, 'phones', phones)
 
-        const csvs = []
-        const results = []
-
         updateMessage('Calling Google Maps Places')
-        let count = 0;
+
         for (let i = 0; i < addresses.length; i++) {
             console.log('Processing address', addresses[i])
-            const result = await placeSearch(addresses[i], null, csvs)
+            const result = await placeSearch(addresses[i], null, csvs, count)
             await sleep();
             results.push(result)
             count += 1;
@@ -139,7 +164,7 @@ const placesSearch = async (apiKey, address, phone, fileContents) => {
         }
         for (let i = 0; i < phones.length; i++) {
             console.log('Processing phone', phones[i])
-            const result = await placeSearch(null, phones[i], csvs)
+            const result = await placeSearch(null, phones[i], csvs, count)
             await sleep();
             results.push(result)
             count += 1;
@@ -148,28 +173,17 @@ const placesSearch = async (apiKey, address, phone, fileContents) => {
             updateMessage(msg);
         }
 
-        console.log('$$$$$ csvs', csvs)
-        const rowsWithCommas = csvs.map(row => row.join(','))
-        console.log('rowsWithCommas', rowsWithCommas, csvs, csvs.length)
-
-        const csvStrNoHeaders = rowsWithCommas.join('\r\n');
-        console.log('csvStrNoHeaders', csvStrNoHeaders)
-
-        console.log('rowsWithCommas', rowsWithCommas, 'csvStrNoHeaders', csvStrNoHeaders)
-        const csv = generate_csv_headers().join(',') + '\r\n' + csvStrNoHeaders
-        console.log('csv', csv)
-
-        downloadFile(csv, 'data.csv', "text/csv");
-        updateMessage('Download Complete.  The CSV should have downloaded or opened up in an application like Excel')
+        generateAndSaveCsv(null, csvs, count)
 
     } catch (err) {
-        handleError(err)
+        handleError(err, count)
         console.error(err)
+        generateAndSaveCsv(err, csvs, count)
     }
 
 }
 
-const placeDetails = async (result, csvs) => {
+const placeDetails = async (result, csvs, count) => {
     console.log('placeDetails');
 
     /*
@@ -181,7 +195,7 @@ const placeDetails = async (result, csvs) => {
     */
 
     const fields = 'id,formatted_address,international_phone_number,formatted_phone_number,geometry,name,place_id,url,website,types';
-    await apiClient(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${result.place_id}&key=${config.google.apiKey}&fields=${fields}`, csvs)
+    await apiClient(`https://maps.googleapis.com/maps/api/place/details/json?placeid=${result.place_id}&key=${config.google.apiKey}&fields=${fields}`, csvs, count)
 }
 
 /*/
@@ -286,9 +300,9 @@ const clearMessage = () => {
     document.getElementById('phone').value = '';
 }
 
-const handleError = (err) => {
+const handleError = (err, count) => {
     clearMessage()
-    document.getElementById('message').innerHTML = err.message;
+    document.getElementById('message').innerHTML = `${err.message} Called: ${count}`;
 }
 
 const updateMessage = (message) => {
