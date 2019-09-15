@@ -1,14 +1,16 @@
 const config = {
     google: {
-        apiKey: '*** ADD YOUR GOOGLE MAPS API KEY HERE ***',
+        apiKey: '*** REPLACE TEXT INSIDE THE QUOTES WITH YOUR GOOGLE MAPS API KEY ***',
         maps: {
             zoom: 15,
-            coordinates : {
-                lat: '***** ADD THE LATITUDE OF THE MAP YOU WANT TO SEARCH ******',
-                lon: '***** ADD THE LONGITUDE OF THE MAP YOU WANT TO SEARCH *****'
+            coordinates: {
+                lat: '***** REPLACE TEXT INSIDE THE QUOTES WITH THE LATITUDE OF THE MAP YOU WANT TO SEARCH ******',
+                lon: '***** REPLACE TEXT INSIDE THE QUOTES WITH THE LONGITUDE OF THE MAP YOU WANT TO SEARCH *****'
             },
         },
-        delayMilliseconds: 500
+        delayMilliseconds: 500,
+        geocodeDistanceMeters: 20,
+        nearbySearchStopAtFirstMatch: true
     },
 
     corsProxyUrl: 'https://cors-anywhere.herokuapp.com/',

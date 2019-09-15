@@ -8,13 +8,16 @@
     <meta name="description" content="The HTML5 Herald">
     <meta name="author" content="SitePoint">
 
-    <link rel="stylesheet" href="css/styles.css?v=1.0">
+    <!--<link rel="stylesheet" href="css/styles.css?v=1.0">-->
 
     <style>
-        .message {color:red; font-size: 150%;}
+        .message {
+            color: red;
+            font-size: 150%;
+        }
 
         input, textarea, select, submit {
-            width : 400px;
+            width: 400px;
             margin: 0;
 
             -webkit-box-sizing: border-box; /* For legacy WebKit based browsers */
@@ -23,109 +26,54 @@
         }
     </style>
     <script src="https://unpkg.com/google-libphonenumber@3.2.3/dist/libphonenumber.js"></script>
-
-    <script type="module">
-        import config from "./js/config.js";
-        console.log('apiKey', config.google.apiKey)
-
-        import { placesSearch, handleError  } from "./js/api.js";
-
-        const handleSubmit = function (caller) {
-            console.log('handleSubmit', window, caller)
-            try {
-                const address = caller.form.elements.address.value;
-                const phone = caller.form.elements.phone.value;
-                const fileElement = document.getElementById('file') //caller.form.elements.file.baseURI;
-                const file = fileElement && fileElement.files && fileElement.files[0]
-
-                console.log('handleSubmit', 'address', address, 'phone', phone, 'file', file);
-
-                if (!address && !phone && !file) {
-                    throw new Error('Address, phone number, or file must be provided')
-                }
-
-                if ((address && phone) || (address && file) || (phone && file) ) {
-                    return handleError(new Error('You can only enter in an address or a phone number or a file'))
-                }
-
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        console.log('!!!!! onload',e)
-                        var fileContents = e.target.result;
-                        placesSearch(config.google.apiKey, address, phone, fileContents)
-                    };
-                    reader.readAsText(file);
-
-                }
-                else {
-                    placesSearch(config.google.apiKey, address, phone, null)
-                }
-            }
-            catch (err) {
-                handleError(err)
-            }
-        }
-
-        window.onload = () => {
-            try {
-                var button = document.getElementById('submit');
-                button.addEventListener('click',  function () {
-                    handleSubmit(this);
-                });
-
-
-            }
-            catch (err) {
-                handleError(err)
-            }
-        }
-
-        var scriptElement = document.createElement("script");
-        scriptElement.src = "https://maps.googleapis.com/maps/api/js?key="+config.google.apiKey+"&libraries=places&callback=initMap";
-        scriptElement.defer = true;
-        document.head.appendChild(scriptElement);
-
-    </script>
 </head>
 
 <body>
-    <div id="map"></div>
-    <br/>
-    <h3>Google Maps Places: Get Business Name, Address, Phone Numbers, and Website by Searching by Addresses or Phone Number. Results are Exported to CSV
-    </h3>
-    <div class = "message" id="message" ></div>
-    <div id="form">
-        <form>
-            <div>
-                <label for="address">Address:</label>
-                <br/>
-                <input type="text" id="address" name="address">
-            </div>
+<div id="map"></div>
+<br/>
+<h3>Google Maps Places: Get Business Name, Address, Phone Numbers, and Website by Searching by Addresses or Phone
+    Number. Results are Exported to CSV
+</h3>
+<div class="message" id="message"></div>
+<div id="form">
+    <form>
+        <div>
+            <label for="address">Address:</label>
             <br/>
-            or
+            <input type="text" id="address" name="address">
+        </div>
+        <br/>
+        or
+        <br/>
+        <br/>
+        <div>
+            <label for="phone">Phone:</label>
             <br/>
+            <input type="text" id="phone" name="phone">
+        </div>
+        <br/>
+        or
+        <br/>
+        <br/>
+        <div>
+            <label for="file">CSV File (Header in first row: 'address' first column, 'phone' in the second). Addresses
+                and phone numbers don't need to match in the same row. Only the address or phone number is needed for
+                each place searched:</label>
             <br/>
-            <div>
-                <label for="phone">Phone:</label>
-                <br/>
-                <input type="text" id="phone" name="phone">
-            </div>
-            <br/>
-            or
-            <br/>
-            <br/>
-            <div>
-                <label for="file">CSV File (Header in first row: 'address' first column, 'phone' in the second).  Addresses and phone numbers don't need to match in the same row.  Only the address or phone number is needed for each place searched:</label>
-                <br/>
-                <input type="file" id="file" name="file">
-            </div>
+            <input type="file" id="file" name="file">
+        </div>
 
-            <br/>
-            <br/>
-            <!--<input id="submit" type="submit" value="Submit">-->
-            <button id="submit" type="button">Submit</button>
-        </form>
-    </div>
+        <br/>
+        <br/>
+        <!--<input id="submit" type="submit" value="Submit">-->
+        <button id="submit" type="button">Submit</button>
+    </form>
+</div>
+<script type="module">
+    import {init} from './js/init.js';
+
+    console.log('init1', init)
+    init()
+</script>
 </body>
 </html>
