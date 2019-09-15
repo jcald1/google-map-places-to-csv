@@ -273,7 +273,7 @@ const nearbySearch = async (lat, lon, csvs, count) => {
 
     const fields = 'name,vicinity,place_id';
 
-    const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&fields=${fields}&radius=${config.google.geocodeDistanceMeters}&key=${config.google.apiKey}`;
+    const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&fields=${fields}&radius=${config.google.geocodeRadiusMeters}&key=${config.google.apiKey}`;
     console.log('Calling Nearby Search', url);
     const nearbySearch = await apiClient(url, csvs, count);
     console.log('nearbySearch', nearbySearch);

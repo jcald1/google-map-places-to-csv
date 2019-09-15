@@ -9,8 +9,8 @@ const config = {
             },
         },
         delayMilliseconds: 500,
-        geocodeDistanceMeters: 20,
-        nearbySearchStopAtFirstMatch: true
+        geocodeRadiusMeters: 5,
+        nearbySearchStopAtFirstMatch: false
     },
 
     corsProxyUrl: 'https://cors-anywhere.herokuapp.com/',
