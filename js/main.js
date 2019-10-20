@@ -101,9 +101,6 @@ const processRecord = async (records, metadata, currentRecordNumber, outputRecor
             console.error(err);
             lastErr = err;
             continue;
-            // const outputRecord = generateNewOutputRecord(records, currentRecordNumber, metadata, metadata.errorColumnIndex, errMsg, true)
-            // outputRecords.push(outputRecord);
-            // break;
         } else if (geocodeResults.status !== 'OK') {
             throw new Error(`Place Search Result error. Status: ${geocodeResults.status}`);
         }
@@ -126,9 +123,6 @@ const processRecord = async (records, metadata, currentRecordNumber, outputRecor
                 console.error(err);
                 lastErr = err;
                 continue;
-                // const outputRecord = generateNewOutputRecord(records, currentRecordNumber, metadata, metadata.errorColumnIndex, errMsg, true);
-                // outputRecords.push(outputRecord);
-                // continue;
             }
 
             const nearbySearchResults = await nearbySearch(lat, lng, records, metadata, outputRecords, currentRecordNumber);
@@ -163,10 +157,6 @@ const processRecord = async (records, metadata, currentRecordNumber, outputRecor
                     console.error(err);
                     lastErr = err;
                     continue;
-                    // console.error(errMsg);
-                    // const outputRecord = generateNewOutputRecord(records, currentRecordNumber, metadata, metadata.errorColumnIndex, errMsg, true);
-                    // outputRecords.push(outputRecord);
-                    // continue;
                 } else if (placeDetailsResults.status !== 'OK') {
                     throw new Error(`Place Details Result error. Status: ${placeDetailsResults.status} record: ${currentRecordNumber}`);
                 }
@@ -230,14 +220,12 @@ const processData = async (apiKey, address, phone, fileContents) => {
             records = fileContentsData.records;
             metadata = fileContentsData.metadata;
 
-            // console.log('1records', records);
             records = records.map( (record, idx) => {
                 if (idx ===0) {
                     return [ ...record, COLUMNS.ERROR_MESSAGE_STR ];
                 }
                 return [ ...record, ''];
             });
-            // console.log('2records', records);
 
             outputRecords[0] = [ ...records[0], ];
             metadata.addressColumnIndex = outputRecords[0].indexOf(config.google.addressColumnName);
@@ -277,13 +265,12 @@ const processData = async (apiKey, address, phone, fileContents) => {
             currentRecordNumber += 1;
         }
 
-        const lastRecordNumber = currentRecordNumber;
-        generateAndSaveCsv(null, records, outputRecords, lastRecordNumber, records.length-1);
+        generateAndSaveCsv(null, records, outputRecords, currentRecordNumber, records.length-1);
 
     } catch (err) {
         handleError(err, null);
         console.error(err);
-        generateAndSaveCsv(err, records, outputRecords, null, records.length-1);
+        generateAndSaveCsv(err, records, outputRecords, currentRecordNumber, records.length-1);
     }
 };
 

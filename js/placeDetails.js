@@ -18,11 +18,10 @@ const placeDetails = async (place_id, currentRecordNumber) => {
 
 const processPlaceDetailsResponse = (data, lat, lng, records, currentRecordNumber, outputRecords) => {
     console.log('processPlaceDetailsResponse', data, lat, lng, outputRecords);
-    // const csvRow = generateCsvRecordStr(data.result, lat, lng, records, currentRecordNumber);
     const csvRow = generatePlaceDetailsResultCsvArr(data.result, currentRecordNumber, records );
+
     outputRecords.push(csvRow);
-    // outputRecords.push(data.result);
-    // return csvRow;
+
 };
 
 export {
