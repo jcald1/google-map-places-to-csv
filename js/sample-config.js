@@ -10,11 +10,16 @@ const config = {
         },
         delayMilliseconds: 500,
         geocodeRadiusMeters: 5,
-        nearbySearchStopAtFirstMatch: false
+        placeSearchStopAtFirstMatch: true,
+        nearbySearchStopAtFirstMatch: true,
+        geocodeStopAtFirstMatch: true,
+        preferSearchByPhoneToSearchByAddress: true,
+        addressColumnName: "address",
+        phoneNumberColumnName: "phone"
     },
 
     corsProxyUrl: 'https://cors-anywhere.herokuapp.com/',
     country: 'US'
-}
+};
 
 export default config;

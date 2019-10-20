@@ -1,27 +1,27 @@
-console.log('importing')
 import config from "./config.js";
 
-import {callGoogle, handleError} from "./api.js";
+import {processData, handleError} from "./main.js";
 
 const init = () => {
-    console.log('init')
-    console.log('apiKey', config.google.apiKey)
+    console.log('init');
+    console.log('apiKey', config.google.apiKey);
 
     window.onerror = function (msg, url, line) {
         const err = `Uncaught Exception: ${msg} ${url} ${line}`;
+        console.error(err);
         // handleError(err);
-    }
+    };
 
 
-    const handleSubmit = function (caller) {
-        console.log('handleSubmit', window, caller)
+    const handleSubmit = async function (caller) {
+        console.log('handleSubmit', window, caller);
         try {
             const address = caller.form.elements.address.value;
             const phone = caller.form.elements.phone.value;
             const fileElement = document.getElementById('file') //caller.form.elements.file.baseURI;
             const file = fileElement && fileElement.files && fileElement.files[0]
 
-            console.log('handleSubmit', 'address', address, 'phone', phone, 'file', file);
+            console.log('handleSubmit', 'address:', address, 'phone:', phone, 'file:', file);
 
             if (!address && !phone && !file) {
                 throw new Error('Address, phone number, or file must be provided')
@@ -33,20 +33,20 @@ const init = () => {
 
             if (file) {
                 const reader = new FileReader();
-                reader.onload = (e) => {
-                    console.log('!!!!! onload', e)
-                    var fileContents = e.target.result;
-                    callGoogle(config.google.apiKey, address, phone, fileContents)
+                reader.onload = async function (e)  {
+                    console.log('!!!!! onload', e);
+                    let fileContents = e.target.result;
+                    await processData(config.google.apiKey, address, phone, fileContents)
                 };
                 reader.readAsText(file);
 
             } else {
-                callGoogle(config.google.apiKey, address, phone, null)
+                await processData(config.google.apiKey, address, phone, null)
             }
         } catch (err) {
             handleError(err)
         }
-    }
+    };
 
     window.onload = () => {
         try {
@@ -59,11 +59,11 @@ const init = () => {
 
 
         } catch (err) {
-            handleError(err)
+            handleError(err);
         }
     };
 
-    var scriptElement = document.createElement("script");
+    let scriptElement = document.createElement("script");
     //scriptElement.src = "https://maps.googleapis.com/maps/api/js?key=" + config.google.apiKey + "&libraries=places&callback=initMap";
     scriptElement.src = "https://maps.googleapis.com/maps/api/js?key=" + config.google.apiKey + "&libraries=places";
     scriptElement.defer = true;
