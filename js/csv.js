@@ -156,8 +156,8 @@ const generateAndSaveCsv = (err, records, outputRecords, lastRecordNumber, total
     //console.log('csv', csv);
 
     downloadFile(csvStr, 'data.csv', "text/csv");
-    const msg = err ? err.message + `Partial Results Count: ${lastRecordNumber} out of ${totalRecords} total input records. Download Complete.  The CSV should have downloaded or opened in a separate if configured in the browser.` :
-        `Processing Complete Results Count: ${lastRecordNumber} out of ${totalRecords} total input records. The CSV should have downloaded or opened in a separate if configured in the browser.`;
+    const msg = err ? err.message + `Partial Results Count: ${lastRecordNumber} out of ${totalRecords} total input records. Download Complete.  The CSV should have downloaded or opened in a separate app like Excel or Office Libre if configured in the browser.` :
+        `Processing Complete Results Count: ${lastRecordNumber} out of ${totalRecords} total input records. The CSV should have downloaded or opened in a separate app like Excel or Office Libre if configured in the browser.`;
     updateMessage(msg)
 };
 
