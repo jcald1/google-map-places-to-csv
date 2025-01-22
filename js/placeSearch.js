@@ -7,7 +7,8 @@ const placeSearch = async (request, currentRecordNumber, address, phone, outputR
     console.log('placeSearch', 'request', request, 'currentRecordNumber', currentRecordNumber, 'address', address, 'phone', phone);
 
     if (!address && !phone) {
-        console.error(`No address or phone provided in input record number ${currentRecordNumber}`);
+        const errMsg = `No address or phone provided in input record number ${currentRecordNumber}. Could be the header row`;
+        console.info(errMsg);
         return Promise.resolve(null);
     }
     var city = new google.maps.LatLng(config.google.maps.coordinates.lat, config.google.maps.coordinates.lon);
