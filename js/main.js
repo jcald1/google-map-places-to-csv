@@ -34,7 +34,6 @@ const processRecord = async (records, metadata, currentRecordNumber, outputRecor
     let address = '';
     let phone = '';
     if (currentRecordNumber === 0) {
-        // outputRecords[0] = [...records[currentRecordNumber], ...additionalColumnsPlaceSearch[currentRecordNumber]];
         outputRecords[0] = [...records[0]];
     } else if (records[currentRecordNumber][metadata.addressColumnIndex] && (!records[currentRecordNumber][metadata.phoneColumnIndex] || config.google.preferSearchByPhoneToSearchByAddress)) {
         console.log('Using address column address:', 'records[currentRecordNumber]:', records[currentRecordNumber], 'metadata.addressColumnIndex:', metadata.addressColumnIndex, records[currentRecordNumber][metadata.addressColumnIndex]);
@@ -57,7 +56,7 @@ const processRecord = async (records, metadata, currentRecordNumber, outputRecor
     if (!address && !phone) {
         const errMsg = 'Neither address nor phone was provided in the query. Could be a blank row.  Or check that the input file and config file match on at least one column ';
         console.warn(errMsg);
-        return;
+        return outputRecords.push(generateNewOutputRecord(records, currentRecordNumber, metadata, metadata.errorColumnIndex, errMsg, true));;
     }
 
     if (config.cacheTheSearchField) {

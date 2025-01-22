@@ -7,7 +7,7 @@ const placeSearch = async (request, currentRecordNumber, address, phone, outputR
     console.log('placeSearch', 'request', request, 'currentRecordNumber', currentRecordNumber, 'address', address, 'phone', phone);
 
     if (!address && !phone) {
-        const errMsg = `No address or phone provided in input record number ${currentRecordNumber}. Could be the header row`;
+        const errMsg = `No address or phone provided in input record number ${currentRecordNumber}.`;
         console.warn(errMsg);
         return Promise.resolve(null);
     }
