@@ -4,7 +4,7 @@ import {processData, handleError} from "./main.js";
 
 const init = () => {
     console.log('init');
-    console.log('apiKey', config.google.apiKey);
+    console.log('config', config)
 
     window.onerror = function (msg, url, line) {
         const err = `Uncaught Exception: ${msg} ${url} ${line}`;
@@ -34,7 +34,7 @@ const init = () => {
             if (file) {
                 const reader = new FileReader();
                 reader.onload = async function (e)  {
-                    console.log('!!!!! onload', e);
+                    console.log('onload', e);
                     let fileContents = e.target.result;
                     await processData(config.google.apiKey, address, phone, fileContents)
                 };

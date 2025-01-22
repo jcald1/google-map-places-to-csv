@@ -4,8 +4,8 @@ const config = {
         maps: {
             zoom: 15,
             coordinates: {
-                lat: '***** REPLACE TEXT INSIDE THE QUOTES WITH THE LATITUDE OF THE MAP YOU WANT TO SEARCH ******',
-                lon: '***** REPLACE TEXT INSIDE THE QUOTES WITH THE LONGITUDE OF THE MAP YOU WANT TO SEARCH *****'
+                lat: '***** REPLACE TEXT INSIDE THE QUOTES WITH THE LATITUDE OF THE MAP YOU WANT TO SEARCH WITHOUT QUOTES, EXAMPLE: 37.784131 ******',
+                lon: '***** REPLACE TEXT INSIDE THE QUOTES WITH THE LONGITUDE OF THE MAP YOU WANT TO SEARCH WITHOUT QUOTES, EXAMPLE: -122.403295 *****'
             },
         },
         delayMilliseconds: 500,
@@ -15,10 +15,11 @@ const config = {
         geocodeStopAtFirstMatch: true,
         preferSearchByPhoneToSearchByAddress: true,
         addressColumnName: "address",
-        phoneNumberColumnName: "phone"
+        phoneNumberColumnName: "phone",
+        cacheTheSearchField: true
     },
 
-    corsProxyUrl: 'https://cors-anywhere.herokuapp.com/',
+    corsProxyUrl: 'https://test.cors.workers.dev/',
     country: 'US'
 };
 

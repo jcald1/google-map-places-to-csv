@@ -7,7 +7,7 @@ const apiClient = (url, currentRecordNumber) => {
     const proxyurl = config.corsProxyUrl;
 
     console.log(`Calling Google ${url} record number: ${currentRecordNumber}`);
-    return fetch(proxyurl + url)
+    return fetch(proxyurl ? proxyurl + url: proxyurl)
         .then(
             (response) => {
                 if (response.status !== 200) {
