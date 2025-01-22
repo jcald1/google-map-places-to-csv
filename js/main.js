@@ -54,6 +54,12 @@ const processRecord = async (records, metadata, currentRecordNumber, outputRecor
         };
     }
 
+    if (!address && !phone) {
+        const errMsg = 'Neither address nor phone was provided in the query. Could be a blank row.  Or check that the input file and config file match on at least one column ';
+        console.warn(errMsg);
+        return;
+    }
+
     if (config.cacheTheSearchField) {
         if (sessionStorage.getItem(queryField(request))) {
             console.log('Using Cached Results ', request.query || request.phoneNumber);
@@ -142,7 +148,7 @@ const processRecord = async (records, metadata, currentRecordNumber, outputRecor
                 console.error(errMsg);
                 const outputRecord = generateNewOutputRecord(records, currentRecordNumber, metadata, metadata.errorColumnIndex, errMsg, true);
                 // TODO: Move setItem to calling function, remove other places it's set, and only pass in the one record. Also get the ones without a return, just setting the output record
-                sessionStorage.setItem(queryField(request), processedRecord);
+                sessionStorage.setItem(queryField(request), outputRecord);
                 outputRecords.push(outputRecord);
                 continue;
             } else if (nearbySearchResults.status !== 'OK') {
@@ -194,7 +200,7 @@ const processRecord = async (records, metadata, currentRecordNumber, outputRecor
         console.error(errMsg);
         const outputRecord = generateNewOutputRecord(records, currentRecordNumber, metadata, metadata.errorColumnIndex,
             errMsg, true);
-        sessionStorage.setItem(queryField(request), processedRecord);
+        sessionStorage.setItem(queryField(request), outputRecord);
         outputRecords.push(outputRecord);
 
     }

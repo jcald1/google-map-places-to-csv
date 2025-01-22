@@ -19,7 +19,7 @@ const config = {
         cacheTheSearchField: true
     },
 
-    corsProxyUrl: 'https://cors-anywhere.herokuapp.com/',
+    corsProxyUrl: 'https://test.cors.workers.dev/',
     country: 'US'
 };
 
